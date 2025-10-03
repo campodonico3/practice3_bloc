@@ -14,6 +14,9 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: BlocConsumer<AuthBloc, AuthState>(
+        // ✅ Solo escucha cuando vuelve a AuthInitial (logout exitoso)
+        listenWhen: (previous, current) => current is AuthInitial,
+
         listener: (context, state) {
           if (state is AuthInitial) {
             Navigator.pushAndRemoveUntil(
@@ -23,20 +26,36 @@ class HomeScreen extends StatelessWidget {
             );
           }
         },
+
+        // ✅ Solo reconstruye cuando el estado es relevante para la UI
+        buildWhen: (previous, current) {
+          return current is AuthLoading || current is AuthSuccess;
+        },
+
         builder: (context, state) {
+          // Mostrar loader durante el logout
           if (state is AuthLoading) {
             return Center(child: CircularProgressIndicator());
           }
-          return Center(
-            child: Column(
-              children: [
-                Text((state as AuthSuccess).uid),
-                GradientButton(onPressed: () {
-                  context.read<AuthBloc>().add(AuthLogoutRequested());
-                }),
-              ],
-            ),
-          );
+
+          // Mostrar contenido del home (solo cuando es AuthSuccess)
+          if (state is AuthSuccess) {
+            return Center(
+              child: Column(
+                children: [
+                  Text(state.uid),
+                  GradientButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(AuthLogoutRequested());
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // Fallback (no debería llegar aquí gracias a buildWhen)
+          return const SizedBox.shrink();
         },
       ),
     );

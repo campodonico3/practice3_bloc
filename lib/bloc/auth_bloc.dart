@@ -10,17 +10,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onAuthLogoutRequested);
   }
 
-   @override
-   void onChange(Change<AuthState> change) {
-     super.onChange(change);
-     print('AuthBloc - Change - $change');
-   }
+  @override
+  void onChange(Change<AuthState> change) {
+    super.onChange(change);
+    print('AuthBloc - Change - $change');
+  }
 
-   @override
-   void onTransition(Transition<AuthEvent, AuthState> transition) {
-     super.onTransition(transition);
-     print('AuthBloc - Transition - $transition');
-   }
+  @override
+  void onTransition(Transition<AuthEvent, AuthState> transition) {
+    super.onTransition(transition);
+    print('AuthBloc - Transition - $transition');
+  }
 
   void _onAuthLoginRequested(
     AuthLoginRequested event,
@@ -29,12 +29,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final email = event.email;
-      final password = event.password;       
+      final password = event.password;
 
       if (password.length < 6) {
-        return emit(
-          AuthFailure('Password cannot be less than 6 characters!'),
-        );
+        return emit(AuthFailure('Password cannot be less than 6 characters!'));
       }
 
       await Future.delayed(const Duration(seconds: 1), () {
